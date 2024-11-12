@@ -19,7 +19,7 @@ export const NODE_URL = "https://fullnode.devnet.aptoslabs.com";
 export const client = new AptosClient(NODE_URL);
 // change this to be your module account address
 export const moduleAddress =
-  "0xcbddf398841353776903dbab2fdaefc54f181d07e114ae818b1a67af28d1b018";
+  "0xf00647f6191e75fb0dbb51b093726bb387371bbe2d89f7b7a33f31602cad705";
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);

@@ -8,4 +8,4 @@ rev = 'devnet'
 subdir = 'aptos-move/framework/aptos-framework'
 
 [addresses]
-todolist_addr='_'
+todolist_addr='0xf00647f6191e75fb0dbb51b093726bb387371bbe2d89f7b7a33f31602cad705'
