@@ -4,6 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { DarkModeContextProvider } from "./context/darkModeContext";
 
 const wallets = [new PetraWallet()];
 
@@ -12,9 +13,11 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
-      <App />
-    </AptosWalletAdapterProvider>
+    <DarkModeContextProvider>
+      <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
+        <App />
+      </AptosWalletAdapterProvider>
+    </DarkModeContextProvider>
   </React.StrictMode>
 );
 
