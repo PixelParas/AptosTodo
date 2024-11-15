@@ -1,3 +1,1 @@
-# todolist-dapp-tutorial
-
-This repo follows [Build an End-to-End Dapp on Aptos tutorial](https://aptos.dev/tutorials/build-e2e-dapp/e2e-dapp-index)
+Contract Address: 0f00647f6191e75fb0dbb51b093726bb387371bbe2d89f7b7a33f31602cad705
