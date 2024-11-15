@@ -13,6 +13,33 @@ module todolist_addr::todolist {
   const ETASK_DOESNT_EXIST: u64 = 2;
   const ETASK_IS_COMPLETED: u64 = 3;
 
+  
+  struct UserInfo has key{
+      user_name: String,
+      user_avatar: String,
+      account_balance: u64,
+      weekly_limit: u64,
+      incomings: u64,
+      outgoings: u64
+  }
+  struct TransactionList has key{
+    transactions: Table<u64, Transaction>,
+    set_transaciton_event: event::EventHandle<Transaction>,
+    transaction_counter: u64
+  }
+  struct Transaction has store, drop, copy {
+    transaction_id: u64,
+    transaction_address: address,
+    product_name: String,
+    product_image: String,
+    time: String,
+    cutomer_name:String,
+    date: String,
+    amount: u64,
+    payment_method: String,
+    status: String
+  }
+
   struct TodoList has key {
     tasks: Table<u64, Task>,
     set_task_event: event::EventHandle<Task>,
@@ -24,6 +51,27 @@ module todolist_addr::todolist {
     address:address,
     content: String,
     completed: bool,
+  }
+
+  public entry fun create_userInfo(account: &signer, user_name: String, user_avatar: String, account_balance: u64, weekly_limit: u64, incomings:u64,outgoings:u64){
+    let user_info = UserInfo{
+      user_name,
+      user_avatar,
+      account_balance,
+      weekly_limit,
+      incomings,
+      outgoings,
+    };
+    move_to(account, user_info);
+  }
+  public entry fun create_transactionlist(account: &signer){
+    let transaction_list = TransactionList {
+      transactions: table::new(),
+      set_transaciton_event: account::new_event_handle<Transaction>(account),
+      transaction_counter: 0
+    };
+    // move the TodoList resource under the signer account
+    move_to(account, transaction_list);
   }
 
   public entry fun create_list(account: &signer){
@@ -60,6 +108,46 @@ module todolist_addr::todolist {
     event::emit_event<Task>(
       &mut borrow_global_mut<TodoList>(signer_address).set_task_event,
       new_task,
+    );
+  }
+  public entry fun create_transaction(account: &signer, 
+    product_name: String, 
+    product_image: String, 
+    time:String,    
+    cutomer_name:String,
+    date: String,
+    amount: u64,
+    payment_method: String,
+    status: String) acquires TransactionList {
+    // gets the signer address
+    let signer_address = signer::address_of(account);
+    // assert signer has created a list
+    assert!(exists<TransactionList>(signer_address), E_NOT_INITIALIZED);
+    // gets the TodoList resource
+    let transaction_list = borrow_global_mut<TransactionList>(signer_address);
+    // increment task counter
+    let counter = transaction_list.transaction_counter + 1;
+    // creates a new Task
+    let new_transaction = Transaction {
+      transaction_id: counter,
+      transaction_address: signer_address,
+      product_name,
+      product_image,
+      time,
+      cutomer_name,
+      date,
+      amount,
+      payment_method,
+      status
+    };
+    // adds the new task into the tasks table
+    table::upsert(&mut transaction_list.transactions, counter, new_transaction);
+    // sets the task counter to be the incremented counter
+    transaction_list.transaction_counter = counter;
+    // fires a new task created event
+    event::emit_event<Transaction>(
+      &mut borrow_global_mut<TransactionList>(signer_address).set_transaciton_event,
+      new_transaction,
     );
   }
 
