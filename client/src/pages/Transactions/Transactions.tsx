@@ -17,7 +17,6 @@ const List = () => {
       <Navbar/>
     <div className="datatable">
       <div className="datatableTitle">
-        Group members
         <Link to="/users/new" className="link">
           Add New
         </Link>

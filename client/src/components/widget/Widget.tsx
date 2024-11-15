@@ -7,14 +7,12 @@ import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlin
 import { orange } from "@mui/material/colors";
 import { BorderAllRounded } from "@mui/icons-material";
 
-
 import { tableCellClasses } from "@mui/material/TableCell";
 
 import React, { useEffect, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 
 import { AptosClient } from "aptos";
-import { userInfo } from "os";
 export const NODE_URL = "https://fullnode.devnet.aptoslabs.com";
 export const client = new AptosClient(NODE_URL);
 // change this to be your module account address
@@ -22,7 +20,6 @@ export const moduleAddress =
   "0xf00647f6191e75fb0dbb51b093726bb387371bbe2d89f7b7a33f31602cad705";
 
   type UserInfo = {
-    user_addr: string,
     user_name: string,
     user_avatar: string,
     account_balance: string,
@@ -33,50 +30,50 @@ export const moduleAddress =
 
 const Widget = ({ type } : {type:string}) => {
   let data: any;
-  let user_info: any;
   //temporary
   const amount = 100;
   const diff = 20;
 
-  
   const [transactions, setTransactions] = useState<UserInfo>();
+  const [newTransaction, setNewTransaction] = useState<string>("");
   const { account, signAndSubmitTransaction } = useWallet();
-  const [accountHasList, setAccountHasUserInfo] = useState<boolean>(false);
+  const [accountHasList, setAccountHasList] = useState<boolean>(false);
+  const [transactionInProgress, setTransactionInProgress] =
+    useState<boolean>(false);
 
-  const fetchUserInfo = async () => {
+  const onWriteTransaction = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setNewTransaction(value);
+  };
+
+  const fetchList = async () => {
     if (!account) return [];
     try {
       const transactionListResource = await client.getAccountResource(
         account?.address,
         `${moduleAddress}::todolist::UserInfo`
       );
-      setAccountHasUserInfo(true);
-
-      user_info={
-        userName: (transactionListResource as any).data.user_name,
-        userAvatar: (transactionListResource as any).data.user_avatar  ,
-        accountBalance: (transactionListResource as any).data.account_balance ,
-        weeklyLimit:(transactionListResource as any).data.weekly_limit ,
-        _incomings:(transactionListResource as any).data.incomings ,
-        _outgoings: (transactionListResource as any).data.outgoings
-      }
-
-
+      setAccountHasList(true);
+      // tasks table handle
+      console.log("Success");
     } catch (e: any) {
-      setAccountHasUserInfo(false);
+      setAccountHasList(false);
+      console.log("fail");
     }
   };
 
   useEffect(() => {
-    fetchUserInfo();
+    fetchList();
   }, [account?.address]);
+
+
 
   switch (type) {
     case "user":
       data = {
         avatar: "https://images.pexels.com/photos/941693/pexels-photo-941693.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
         hasImage: true,
-        title: "PIXELPARAS",
+        title: "PixelParas",
         isMoney: true,
         amount: 2560,
         link: "See all users",
@@ -96,7 +93,7 @@ const Widget = ({ type } : {type:string}) => {
         title: "WEEKLY LIMIT",
         isMoney: true,
         hasImage: false,
-        amount: user_info.weeklyLimit,
+        amount: 5000,
         link: "change limit",
         icon: (
           <MonetizationOnOutlinedIcon
@@ -114,7 +111,7 @@ const Widget = ({ type } : {type:string}) => {
         title: "INCOMINGS",
         isMoney: true,
         hasImage: false,
-        amount: user_info._incomings,
+        amount: 2150,
         link: "see details",
         icon: (
           <AccountBalanceWalletOutlinedIcon
@@ -129,7 +126,7 @@ const Widget = ({ type } : {type:string}) => {
         title: "OUTGOINGS",
         isMoney: true,
         hasImage: false,
-        amount: user_info._outgoings,
+        amount: 1658,
         link: "See details",
         icon: (
           <AccountBalanceWalletOutlinedIcon
@@ -153,11 +150,11 @@ const Widget = ({ type } : {type:string}) => {
       <div className="widget">
         <div className="hasImage">
           <span className="Image">
-                <img src={user_info.userAvatar} height={100} width={100}/>
+                <img src={data.avatar} height={100} width={100}/>
             </span>
-            <span className="title">{user_info.userName}</span>
+            <span className="title">{data.title}</span>
             <span className="counter">
-              {data.isMoney && "$"} {user_info.accountBalance}
+              {data.isMoney && "$"} {data.amount}
             </span>
             {data.icon}
           </div>
